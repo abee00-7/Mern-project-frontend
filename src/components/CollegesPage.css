@@ -1,0 +1,24 @@
+/* CollegesPage.css */
+
+.colleges-page {
+    padding-top: 80px; /* Ensure there is enough space below the fixed navbar */
+    background-color: lightgoldenrodyellow;
+  }
+  
+  .card {
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .card-text {
+    font-size: 1rem;
+  }
+  

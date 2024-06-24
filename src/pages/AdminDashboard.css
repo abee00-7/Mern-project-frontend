@@ -1,0 +1,110 @@
+/* AdminDashboard.css */
+
+.dashboard {
+  display: flex;
+  flex-direction: row;
+}
+
+.sidebar {
+  background-color: #f0f0f0;
+  padding: 15px;
+  border-radius: 5px;
+  min-width: 200px; /* Ensure sidebar has a minimum width */
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  cursor: pointer;
+  padding: 10px 0;
+  margin-bottom: 5px;
+}
+
+.sidebar li.active {
+  font-weight: bold;
+  color: #007bff; /* Active link color */
+}
+
+.main-content {
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.main-content h2 {
+  margin-bottom: 20px;
+}
+
+.main-content > div {
+  margin-bottom: 20px;
+}
+
+.main-content label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.main-content input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.main-content button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.main-content button:hover {
+  background-color: #0056b3;
+}
+
+.main-content ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.main-content ul li {
+  margin-bottom: 10px;
+}
+
+.main-content .btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.main-content .btn-danger:hover {
+  background-color: #c82333;
+}
+
+
+.logout-link {
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+
+}
+
+.logout-link:hover {
+  text-decoration: underline;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -1,0 +1,148 @@
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.landing-page .navbar {
+  margin-bottom: 20px;
+}
+
+.landing-page .carousel-item img {
+  height: 400px;
+  object-fit: cover;
+}
+
+.landing-page footer {
+  margin-top: auto;
+  background-color:#ffd480;
+  padding: 20px 0;
+}
+.navbar {
+  background: linear-gradient(135deg, #a6a62b, #ea9643); /* Gradient background */
+  padding: 15px 0; /* Padding for navbar */
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+  color: red;
+}
+
+.features {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.features .card {
+  transition: transform 0.2s;
+}
+
+.features .card:hover {
+  transform: scale(1.05);
+}
+
+.reviews {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  background-color: #f8f9fa;
+}
+
+.reviews .card {
+  transition: transform 0.2s;
+}
+
+.reviews .card:hover {
+  transform: scale(1.05);
+}
+.features {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.features .card {
+  transition: transform 0.2s;
+}
+
+.features .card:hover {
+  transform: scale(1.05);
+}
+
+.features .card .card-body {
+  background-color:	 #ffe6b3; /* Change this color as needed */
+}
+
+.reviews {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  background-color: #f8f9fa;
+}
+
+.reviews .card {
+  transition: transform 0.2s;
+}
+
+.reviews .card:hover {
+  transform: scale(1.05);
+}
+
+.reviews .card .card-body {
+  background-color:  	 #ffe6b3; /* Change this color as needed */
+}
+.services {
+  padding: 50px 0;
+}
+
+.services h4 {
+  margin-top: 20px;
+}
+
+.services p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.faq {
+  padding: 50px 0;
+}
+
+.faq .card {
+  margin-bottom: 15px;
+}
+
+.faq .card-header {
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.faq .card-body {
+  background-color: #f8f9fa;
+}
+
+.call-to-action {
+  background-color: black; /* Primary blue background */
+  color: #fff;
+  padding: 100px 0;
+  text-align: center;
+}
+
+.call-to-action h2 {
+  margin-bottom: 20px;
+}
+
+.call-to-action p {
+  margin-bottom: 40px;
+}
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  .carousel {
+    margin-top: 56px; /* Height of the fixed navbar */
+  }
+
+  .call-to-action {
+    padding: 80px 0;
+  }
+}

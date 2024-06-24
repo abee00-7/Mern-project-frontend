@@ -1,0 +1,19 @@
+body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .navbar {
+    margin-bottom: 20px;
+  }
+  
+  .carousel-item img {
+    height: 400px;
+    object-fit: cover;
+  }
+  
+  footer {
+    margin-top: auto;
+    background-color: #f8f9fa;
+    padding: 20px 0;
+  }
+  

@@ -1,0 +1,32 @@
+/* About.css */
+
+.about-container {
+  background-color: lightgoldenrodyellow;
+  padding: 50px;
+  margin-top: 50px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  text-align: center; /* Center-align all text */
+}
+
+.about-container h2 {
+  margin-bottom: 20px;
+}
+
+.about-container p {
+  margin-bottom: 15px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.about-container ul {
+  margin-top: 10px;
+  padding-left: 0; /* Remove default padding */
+  list-style-position: inside; /* Move bullet points inside */
+  display: inline-block; /* Center the list items */
+  text-align: left; /* Align the list items text to the left */
+}
+
+.about-container li {
+  margin-bottom: 10px;
+}

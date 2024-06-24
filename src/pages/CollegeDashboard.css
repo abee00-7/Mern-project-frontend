@@ -1,0 +1,67 @@
+/* CollegeDashboard.css */
+
+.dashboard {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 250px; /* Adjust the width as needed */
+  background-color: #f0f0f0;
+  padding: 20px;
+  height: 100vh; /* Full height of the viewport */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.sidebar ul li.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.main-content {
+  padding: 20px;
+  flex-grow: 1; /* Main content grows to fill remaining space */
+  overflow-y: auto; /* Add scroll if content overflows */
+}
+
+form > div {
+  margin-bottom: 15px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+form input, form select, form textarea {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.logout-link {
+  color: #007bff;
+  text-decoration: none;
+  cursor: pointer;
+
+}
+
+.logout-link:hover {
+  text-decoration: underline;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
