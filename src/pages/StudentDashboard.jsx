@@ -1,139 +1,347 @@
-import React, { useState } from 'react';
-import './StudentDashboard.css'; // Import the CSS file
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Form, Button, Table, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import allapi from '../services/allApi';
+import './StudentDashboard.css'; // Import CSS file
 
 function StudentDashboard() {
-  const [selectedOption, setSelectedOption] = useState('profile'); // Default selected option
-  const [profile, setProfile] = useState({
-    fullname: '',
-    email: '',
-    gender: '',
-    place: '',
-    qualification: '',
-  });
-  const [aptitudeAnswers, setAptitudeAnswers] = useState({});
-  const [marks, setMarks] = useState(null);
-  const [colleges, setColleges] = useState([
-    { name: 'College A', cutoff: 75 },
-    { name: 'College B', cutoff: 85 },
-    { name: 'College C', cutoff: 65 },
-  ]);
-
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option);
-  };
-
-  const handleProfileChange = (e) => {
-    const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
-  };
-
-  const handleAptitudeChange = (questionId, answer) => {
-    setAptitudeAnswers({ ...aptitudeAnswers, [questionId]: answer });
-  };
+  const [profile, setProfile] = useState({});
+  const [profileUpdateData, setProfileUpdateData] = useState({});
+  const [testQuestions, setTestQuestions] = useState(null); // Initialize as null
+  const [testAnswers, setTestAnswers] = useState({});
+  const [colleges, setColleges] = useState([]);
+  const [filteredColleges, setFilteredColleges] = useState([]); // State for filtered colleges
+  const [testScore, setTestScore] = useState(null);
+  const [error, setError] = useState('');
+  const [testSubmitted, setTestSubmitted] = useState(false); // State to track test submission
+  const [selectedOption, setSelectedOption] = useState('profile');
+  const [selectedCollege, setSelectedCollege] = useState(null); // State for selected college details
+  const [showModal, setShowModal] = useState(false); // State for modal visibility
   const navigate = useNavigate();
-  const calculateMarks = () => {
-    // Dummy calculation
-    const correctAnswers = Object.values(aptitudeAnswers).filter(answer => answer === 'correct').length;
-    setMarks(correctAnswers * 10); // Assuming each question is worth 10 marks
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      loadProfileData(token);
+      fetchColleges();
+    } else {
+      navigate('/');
+    }
+  }, []);
+
+  useEffect(() => {
+    // Filter colleges whenever testScore or colleges array changes
+    filterCollegesByTestScore();
+  }, [testScore, colleges]);
+
+  const fetchColleges = async () => {
+    try {
+      const data = await allapi.getAllColleges();
+      setColleges(data);
+      console.log('Colleges fetched:', data); // Debugging log
+    } catch (error) {
+      console.error('Error fetching colleges:', error);
+    }
   };
+
+  const loadProfileData = async (token) => {
+    try {
+      const profileData = await allapi.getProfile(token);
+      setProfile(profileData);
+      setProfileUpdateData({
+        fullname: profileData.fullname,
+        email: profileData.email,
+        location: profileData.location,
+        phonenumber: profileData.phonenumber,
+      });
+
+      console.log('Profile data loaded:', profileData); // Debugging log
+
+      if (profileData.testScore !== undefined && profileData.testScore !== null) {
+        setTestScore(profileData.testScore);
+        loadCollegesByMarks(token);
+      } else {
+        loadTestQuestions(token);
+      }
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+      setError('Failed to load profile. Please try again.');
+    }
+  };
+
+  const loadTestQuestions = async (token) => {
+    try {
+      const questions = await allapi.fetchTestQuestions(token);
+      setTestQuestions(questions);
+      console.log('Test questions loaded:', questions); // Debugging log
+    } catch (error) {
+      console.error('Failed to fetch test questions:', error);
+      setError('Failed to fetch test questions. Please try again.');
+    }
+  };
+
+  const loadCollegesByMarks = async (token) => {
+    try {
+      const data = await allapi.getCollegesByMarks(token);
+      setFilteredColleges(data);
+      console.log('Colleges by marks loaded:', data); // Debugging log
+    } catch (error) {
+      console.error('Failed to load colleges by marks:', error);
+      setError('Failed to load colleges by marks. Please try again.');
+    }
+  };
+
+  const filterCollegesByTestScore = () => {
+    if (testScore !== null) {
+      const filtered = colleges.filter(college => college.cutoffmark <= testScore);
+      setFilteredColleges(filtered);
+      console.log('Filtered colleges:', filtered); // Debugging log
+    }
+  };
+
+  const handleAnswerChange = (questionId, answer) => {
+    setTestAnswers({
+      ...testAnswers,
+      [questionId]: answer,
+    });
+  };
+
+  const handleTestSubmission = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const testAnswersData = Object.keys(testAnswers).map((questionId) => ({
+        questionId,
+        answer: testAnswers[questionId],
+      }));
+
+      const response = await allapi.submitTestAnswers(token, testAnswersData);
+      setTestScore(response.score);
+      toast.success(`Test submitted successfully! Your score: ${response.score}`, {
+        autoClose: 5000,
+        position: "top-center"
+      });
+
+      localStorage.setItem('testScore', response.score);
+      setProfile({
+        ...profile,
+        testScore: response.score,
+      });
+
+      loadCollegesByMarks(token);
+      setTestSubmitted(true);
+    } catch (error) {
+      console.error('Failed to submit test:', error);
+      setError('Failed to submit test. Please try again.');
+    }
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const updatedProfile = await allapi.updateProfile(token, profileUpdateData);
+      setProfile(updatedProfile);
+      toast.success('Profile updated successfully!', {
+        autoClose: 3000,
+        position: "top-center"
+      });
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      setError('Failed to update profile. Please try again.');
+    }
+  };
+
   const handleLogout = () => {
-  
-    console.log('Logged out');
+    localStorage.removeItem('token');
+    localStorage.removeItem('testScore');
     navigate('/');
   };
+
+  const viewCollegeDetails = (collegeId) => {
+    const selected = colleges.find(college => college._id === collegeId);
+    setSelectedCollege(selected);
+    setShowModal(true); // Show the modal
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   return (
-    <div className="dashboard">
-      <div className="sidebar">
-        <ul>
-          <li className={selectedOption === 'profile' ? 'active' : ''} onClick={() => handleOptionSelect('profile')}>
-            Profile
-          </li>
-          <li className={selectedOption === 'aptitude' ? 'active' : ''} onClick={() => handleOptionSelect('aptitude')}>
-            Aptitude Test
-          </li>
-          <li className={selectedOption === 'viewColleges' ? 'active' : ''} onClick={() => handleOptionSelect('viewColleges')}>
-            View Colleges by Marks
-          </li>
-        </ul>
-      </div>
-      <div className="main-content">
+    <Container fluid className="student-dashboard">
+      <Row>
+        <Col md={3} className="sidebar">
+          <Card className="sidebar-card">
+            <Card.Body>
+              <Card.Title>Options</Card.Title>
+              <ul className="nav flex-column">
+                <li className="nav-item">
+                  <button className={`nav-link ${selectedOption === 'profile' ? 'active' : ''}`} onClick={() => setSelectedOption('profile')}>Profile</button>
+                </li>
+                <li className="nav-item">
+                  <button className={`nav-link ${selectedOption === 'aptitudeTest' ? 'active' : ''}`} onClick={() => setSelectedOption('aptitudeTest')}>Aptitude Test</button>
+                </li>
+                <li className="nav-item">
+                  <button className={`nav-link ${selectedOption === 'colleges' ? 'active' : ''}`} onClick={() => setSelectedOption('colleges')}>View Colleges</button>
+                </li>
+              </ul>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={9} className="main-content">
+          <div className="main-header">
+            <h2 className="main-heading">Student Dashboard</h2>
+            <div className="logout">
+              <Button variant="link" onClick={handleLogout}>
+                Logout <i className="fa-solid fa-right-from-bracket"></i>
+              </Button>
+            </div>
+          </div>
+          <div className="main-window">
+            {selectedOption === 'profile' && (
+              <div>
+                <h3>Update Profile</h3>
+                <Form onSubmit={handleProfileUpdate}>
+                  <Form.Group controlId="formFullname">
+                    <Form.Label>Full Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter Full Name"
+                      value={profileUpdateData.fullname || profile.fullname}
+                      onChange={(e) => setProfileUpdateData({ ...profileUpdateData, fullname: e.target.value })}
+                      required
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="formEmail">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="Enter Email"
+                      value={profileUpdateData.email || profile.email}
+                      onChange={(e) => setProfileUpdateData({ ...profileUpdateData, email: e.target.value })}
+                      required
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="formLocation">
+                    <Form.Label>Location</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter Location"
+                      value={profileUpdateData.location || profile.location}
+                      onChange={(e) => setProfileUpdateData({ ...profileUpdateData, location: e.target.value })}
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="formPhonenumber">
+                    <Form.Label>Phone Number</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter Phone Number"
+                      value={profileUpdateData.phonenumber || profile.phonenumber}
+                      onChange={(e) => setProfileUpdateData({ ...profileUpdateData, phonenumber: e.target.value })}
+                    />
+                  </Form.Group>
+                  <Button variant="primary" type="submit">
+                    Update Profile
+                  </Button>
+                </Form>
+              </div>
+            )}
+            {selectedOption === 'aptitudeTest' && testScore === null && (
+              <div>
+                <h3>Aptitude Test</h3>
+                <Form onSubmit={handleTestSubmission}>
+                  {testQuestions && testQuestions.length > 0 ? (
+                    testQuestions.map((question, index) => (
+                      <div key={question._id}>
+                        <h4>{question.question}</h4>
+                        {question.options.map((option, idx) => (
+                          <Form.Check
+                            key={option}
+                            type="radio"
+                            label={option}
+                            name={`question-${question._id}`}
+                            id={`question-${question._id}-option-${idx}`}
+                            onChange={() => handleAnswerChange(question._id, option)}
+                          />
+                        ))}
+                      </div>
+                    ))
+                  ) : (
+                    <p>Loading questions...</p>
+                  )}
+                  <Button variant="primary" type="submit">Submit Test</Button>
+                </Form>
+              </div>
+            )}
+            {selectedOption === 'aptitudeTest' && testScore !== null && testScore !== 0 && (
+              <div>
+                <h3>Test Score</h3>
+                <p>Your score: {testScore}</p>
+              </div>
+            )}
+            {selectedOption === 'colleges' && (
+              <div>
+                <h3>Colleges by Marks</h3>
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>Full Name</th>
+                      <th>Email</th>
+                      <th>Location</th>
+                      <th>Courses</th>
+                      <th>Cutoff Mark</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredColleges.map(college => (
+                      <tr key={college._id}>
+                        <td>{college.fullname}</td>
+                        <td>{college.email}</td>
+                        <td>{college.location}</td>
+                        <td>{college.courses}</td>
+                        <td>{college.cutoffmark}</td>
+                        <td>
+                          <Button variant="primary" onClick={() => viewCollegeDetails(college._id)}>View Details</Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+            )}
+          </div>
+        </Col>
+      </Row>
+
     
-        <div className="header">
-          <h2>Admin Dashboard</h2>
-          <a href="#" className="logout-link" onClick={handleLogout}>Logout <i className="fa-solid fa-right-from-bracket"></i> </a>
-        </div>
-        {selectedOption === 'profile' && (
-          <div>
-            <h3>Student Profile</h3>
-            <form>
-              <div>
-                <label>Full Name</label>
-                <input type="text" name="fullname" value={profile.fullname} onChange={handleProfileChange} placeholder="Enter your full name" required />
-              </div>
-              <div>
-                <label>Email</label>
-                <input type="email" name="email" value={profile.email} onChange={handleProfileChange} placeholder="Enter email" required />
-              </div>
-              <div>
-                <label>Gender</label>
-                <select name="gender" value={profile.gender} onChange={handleProfileChange} required>
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-              <div>
-                <label>Place</label>
-                <input type="text" name="place" value={profile.place} onChange={handleProfileChange} placeholder="Enter your place" required />
-              </div>
-              <div>
-                <label>Last Qualification</label>
-                <input type="text" name="qualification" value={profile.qualification} onChange={handleProfileChange} placeholder="Enter your last qualification" required />
-              </div>
-              <button type="submit">Update Profile</button>
-            </form>
-          </div>
-        )}
-        {selectedOption === 'aptitude' && (
-          <div>
-            <h3>Aptitude Test</h3>
-            <form>
-              <div>
-                <label>Question 1: What is 2 + 2?</label>
-                <div>
-                  <input type="radio" name="q1" value="correct" onChange={() => handleAptitudeChange('q1', 'correct')} /> 4
-                </div>
-                <div>
-                  <input type="radio" name="q1" value="wrong" onChange={() => handleAptitudeChange('q1', 'wrong')} /> 5
-                </div>
-              </div>
-              <div>
-                <label>Question 2: What is the capital of France?</label>
-                <div>
-                  <input type="radio" name="q2" value="correct" onChange={() => handleAptitudeChange('q2', 'correct')} /> Paris
-                </div>
-                <div>
-                  <input type="radio" name="q2" value="wrong" onChange={() => handleAptitudeChange('q2', 'wrong')} /> London
-                </div>
-              </div>
-              <button type="button" onClick={calculateMarks}>Submit Test</button>
-            </form>
-            {marks !== null && <div>Your marks: {marks}</div>}
-          </div>
-        )}
-        {selectedOption === 'viewColleges' && (
-          <div>
-            <h3>View Colleges by Marks</h3>
-            <ul>
-              {colleges.filter(college => marks !== null && marks >= college.cutoff).map(college => (
-                <li key={college.name}>{college.name} (Cutoff: {college.cutoff} marks)</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    </div>
+      <Modal show={showModal} onHide={closeModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>College Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedCollege && (
+            <div>
+              <h5>{selectedCollege.fullname}</h5>
+           
+              <p><strong>Description:</strong> {selectedCollege.description}</p>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+     
+      <ToastContainer />
+
+    </Container>
   );
 }
 

@@ -1,43 +1,36 @@
-/* Login.css */
-
-.container {
-  
-}
-
 .login-container {
-  background-color:lightgrey; /* White background for login form */
-  border: 1px solid #dee2e6; /* Light border */
-  border-radius: 8px; /* Rounded corners */
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
-  padding: 30px;
-  max-width: 100px; /* Limit width for better readability on larger screens */
-  margin: auto; /* Center align on the page */
-  margin-top: 50px; /* Top margin for spacing */
-  text-align: center; /* Center align content */
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.login-container h2 {
-  text-align: center; /* Center align heading */
-  margin-bottom: 20px; /* Bottom margin for spacing */
+.login-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px; /* Reduce max-width to make the div smaller */
+  width: 100%;
 }
 
-.login-container .form-control {
-  width: 40%; /* Full width */
-  padding: 8px; /* Padding around input */
-  font-size: 14px; /* Font size */
-  text-align: center; /* Center align text */
-  margin: 0 auto; /* Center align horizontally */
-  margin-bottom: 10px; /* Bottom margin */
+.login-form-container {
+  background: #f9f9f9;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.login-container .btn-primary {
-  background-color: #007bff; /* Primary button background color */
-  border-color: #007bff; /* Primary button border color */
-  width: 10%; /* Full width button */
-  margin-top: 10px; /* Top margin */
+img {
+  max-width: 100%;
+  height: auto;
 }
 
-.login-container .btn-primary:hover {
-  background-color: #0056b3; /* Darker hover color */
-  border-color: #0056b3; /* Darker hover border color */
+.text-center {
+  text-align: center;
+}
+
+.text-input {
+  width: 100%; /* Ensure text fields fill the form width */
+  margin: 0 auto;
 }

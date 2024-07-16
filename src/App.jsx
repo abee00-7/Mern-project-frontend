@@ -6,7 +6,7 @@ import Signup from './pages/Signup';
 import StudentDashboard from './pages/StudentDashboard';
 import CollegeDashboard from './pages/CollegeDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import About from'./components/About'
+import About from './components/About';
 import CollegesPage from './components/CollegesPage';
 
 function App() {
@@ -15,12 +15,12 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/About" element={<About />} />
+        <Route path="/about" element={<About />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/college-dashboard" element={<CollegeDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/colleges" element={<CollegesPage />}/>
+        <Route path="/colleges" element={<CollegesPage />} />
       </Routes>
     </Router>
   );

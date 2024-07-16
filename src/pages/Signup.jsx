@@ -1,94 +1,113 @@
 import React, { useState } from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import './Signup.css';
+import { Container, Row, Col, Form, Button, FormGroup, FormControl, Alert, FormLabel } from 'react-bootstrap';
+import { useNavigate, Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import allapi from '../services/allApi';
+import loginimg from '../assets/login.png'
+import './Signup.css'; // Import CSS file
 
 function Signup() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [userType, setUserType] = useState('student');
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    email: '',
-  });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log(formData); // Example: Log form data to console
+
+    // Simple form validation
+    if (!username || !email || !password) {
+      setError('Please fill out all required fields.');
+      return;
+    }
+
+    try {
+      const userData = { username, email, password, userType };
+      const response = await allapi.signup(userData);
+      console.log('Signup successful:', response);
+
+      localStorage.setItem('token', response.token);
+
+      toast.success(`Signed up as ${userType} successfully!`, {
+        onClose: () => navigate('/login'),
+        autoClose: 2000,
+        position: "top-center"
+      });
+    } catch (error) {
+      toast.error('Username or Email already exist', error);
+   
+    }
   };
 
   return (
-    <Container className="signup-container ">
-      <Row>
-        <Col md={12}>
-          <h2>Signup</h2>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group>
-              <Form.Label className='text-center'>User Type</Form.Label>
-              <div>
-                <Form.Check
-                  inline
-                  label="Student"
-                  type="radio"
-                  name="userType"
-                  value="student"
-                  checked={userType === 'student'}
-                  onChange={() => setUserType('student')}
-                />
-                <Form.Check
-                  inline
-                  label="College"
-                  type="radio"
-                  name="userType"
-                  value="college"
-                  checked={userType === 'college'}
-                  onChange={() => setUserType('college')}
-                />
+    <div className="signup-container d-flex align-items-center justify-content-center">
+      <Container className="signup-content w-75 ">
+        <Row className="justify-content-center">
+          <Col md={6} className="text-center mb-4">
+            <img src={loginimg} alt="Signup Image" className="img-fluid" />
+          </Col>
+          <Col md={6}>
+            <div className="signup-form-container">
+              <h2 className='fw-bolder text-center'>Signup</h2>
+              {error && <Alert variant="danger">{error}</Alert>}
+              <Form onSubmit={handleSignup}>
+                <FormGroup controlId="formUsername">
+                  <FormControl
+                    type="text"
+                    placeholder="Enter username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="text-input"
+                  />
+                </FormGroup>
+
+                <FormGroup controlId="formEmail">
+                  <FormControl
+                    type="email"
+                    placeholder="Enter email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="text-input mt-3"
+                  />
+                </FormGroup>
+
+                <FormGroup controlId="formPassword">
+                  <FormControl
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="text-input mt-3"
+                  />
+                </FormGroup>
+
+                <FormGroup controlId="formUserType" className="mt-3">
+                  <FormLabel>User Type</FormLabel>
+                  <FormControl as="select" value={userType} onChange={(e) => setUserType(e.target.value)} className="text-input">
+                    <option value="student">Student</option>
+                    <option value="college">College</option>
+                  </FormControl>
+                </FormGroup>
+
+                <div className="text-center">
+                  <Button className='w-75 btn btn-success mt-4' type="submit">
+                    Signup
+                  </Button>
+                </div>
+              </Form>
+              <div className="mt-3 text-center">
+                <span>Already registered? </span>
+                <Link to="/login">Login</Link>
               </div>
-            </Form.Group>
-            <Form.Group controlId="formUsername" className="mt-3">
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-            <Form.Group controlId="formPassword" className="mt-3">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-            <Form.Group controlId="formEmail" className="mt-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit" className="mt-4">
-              Signup
-            </Button>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+            </div>
+          </Col>
+        </Row>
+      </Container>
+      <ToastContainer />
+    </div>
   );
 }
 

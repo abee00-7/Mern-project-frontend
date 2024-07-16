@@ -1,29 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './CollegesPage.css';
-import { Container, Row, Col,Navbar,Nav,Card} from 'react-bootstrap';
+import { Container, Row, Col, Navbar, Nav, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import logo from '../assets/clogo.png'
-
-const colleges = [
-  { id: 1, name: 'College A', location: 'Location A', description: 'Description A' },
-  { id: 2, name: 'College B', location: 'Location B', description: 'Description B' },
-  { id: 3, name: 'College C', location: 'Location C', description: 'Description C' },
-  // Add more colleges as needed
-];
-
+import logo from '../assets/clogo.png';
+import allapi from '../services/allApi'; // Import the API function
 function CollegesPage() {
+  const [colleges, setColleges] = useState([]);
+
+  useEffect(() => {
+    fetchCollegesData();
+  }, []);
+
+  const fetchCollegesData = async () => {
+    try {
+      const data = await allapi.fetchRegisteredColleges();
+      setColleges(data);
+    } catch (error) {
+      console.error('Error fetching registered colleges:', error);
+    }
+  };
+
   return (
- <div>
-  <Navbar bg="light" variant="light" expand="lg" >
+    <div>
+      <Navbar bg="light" variant="light" expand="lg">
         <Container>
           <Navbar.Brand href="/">
             <img
-              src={logo} // Replace with the path to your logo image
+              src={logo}
               width="50"
               height="40"
               className="d-inline-block align-top"
               alt="Logo"
-            /></Navbar.Brand>
+            />
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
@@ -40,14 +49,15 @@ function CollegesPage() {
         <h2 className="text-center mb-4 fw-bolder text-warning">Registered Colleges</h2>
         <Row>
           {colleges.map((college) => (
-            <Col key={college.id} md={4} className="mb-4">
+            <Col key={college._id} md={4} className="mb-4">
               <Card>
                 <Card.Body>
-                  <Card.Title>{college.name}</Card.Title>
+                  <Card.Title>{college.fullname}</Card.Title>
                   <Card.Text>
                     <strong>Location:</strong> {college.location}
                     <br />
-                    <strong>Description:</strong> {college.description}
+                    {/* Assuming courses is an array */}
+                    <strong>Courses:</strong> {college.courses.join(', ')}
                   </Card.Text>
                 </Card.Body>
               </Card>
@@ -55,7 +65,7 @@ function CollegesPage() {
           ))}
         </Row>
       </Container>
- </div>
+    </div>
   );
 }
 
